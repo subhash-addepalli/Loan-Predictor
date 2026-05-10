@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LoanSense — Smart Loan Predictor</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink:#0f1117;--ink-soft:#4a4f5e;--ink-muted:#9198a8;
+      --surface:#f5f6f8;--card:#ffffff;--border:#e2e5ec;
+      --accent:#1a56db;--accent-lt:#e8effe;
+      --green:#0e9f6e;--green-lt:#d5f0e8;
+      --red:#e02424;--red-lt:#fde8e8;
+      --radius:14px;--shadow:0 2px 16px rgba(15,17,23,0.07);
+    }
+    body { font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;padding:0 0 60px; }
+    header { background:var(--card);border-bottom:1px solid var(--border);padding:18px 40px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10; }
+    .logo-mark { width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center; }
+    .logo-text { font-family:'DM Serif Display',serif;font-size:22px;letter-spacing:-0.5px;color:var(--ink); }
+    .logo-text span { color:var(--accent); }
+    .hero { text-align:center;padding:52px 24px 36px; }
+    .hero-tag { display:inline-block;background:var(--accent-lt);color:var(--accent);font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:5px 14px;border-radius:99px;margin-bottom:18px; }
+    .hero h1 { font-family:'DM Serif Display',serif;font-size:clamp(28px,5vw,44px);line-height:1.15;color:var(--ink);margin-bottom:12px; }
+    .hero p { font-size:16px;color:var(--ink-soft);max-width:480px;margin:0 auto;line-height:1.6; }
+    .form-wrap { max-width:720px;margin:0 auto;padding:0 20px; }
+    .card { background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:32px 36px;margin-bottom:20px; }
+    .section-title { font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:20px;display:flex;align-items:center;gap:10px; }
+    .section-title::after { content:'';flex:1;height:1px;background:var(--border); }
+    .grid-2 { display:grid;grid-template-columns:1fr 1fr;gap:18px; }
+    .grid-3 { display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px; }
+    .span-2 { grid-column:span 2; }
+    .field { display:flex;flex-direction:column;gap:6px; }
+    label { font-size:13px;font-weight:500;color:var(--ink-soft); }
+    label .req { color:var(--accent);margin-left:2px; }
+    input,select { width:100%;height:44px;border:1.5px solid var(--border);border-radius:10px;padding:0 14px;font-family:inherit;font-size:14px;color:var(--ink);background:#fff;transition:border-color 0.18s,box-shadow 0.18s;appearance:none;-webkit-appearance:none; }
+    input:focus,select:focus { outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,0.12); }
+    input::placeholder { color:var(--ink-muted); }
+    .select-wrap { position:relative; }
+    .select-wrap::after { content:'';position:absolute;right:14px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid var(--ink-muted);pointer-events:none; }
+    .select-wrap select { padding-right:36px;cursor:pointer; }
+    .hint { font-size:12px;color:var(--ink-muted);margin-top:2px; }
+    .area-option { cursor:pointer; }
+    .area-option input[type=radio] { display:none; }
+    .area-card { display:flex;flex-direction:column;align-items:center;gap:4px;border:1.5px solid var(--border);border-radius:12px;padding:16px 10px 14px;transition:border-color 0.18s,background 0.18s;text-align:center;background:#fff; }
+    .area-option:hover .area-card { border-color:var(--accent);background:var(--accent-lt); }
+    .area-option input:checked + .area-card { border-color:var(--accent);background:var(--accent-lt);box-shadow:0 0 0 3px rgba(26,86,219,0.12); }
+    .area-icon { font-size:28px; }
+    .area-name { font-size:13px;font-weight:600;color:var(--ink); }
+    .area-sub  { font-size:11px;color:var(--ink-muted); }
+    .btn-predict { width:100%;height:52px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-family:inherit;font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background 0.18s,transform 0.12s; }
+    .btn-predict:hover { background:#1447c0; }
+    .btn-predict:active { transform:scale(0.98); }
+    .btn-predict:disabled { background:var(--ink-muted);cursor:not-allowed;transform:none; }
+    .spinner { width:20px;height:20px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    #result-box { display:none;border-radius:var(--radius);padding:28px 32px;margin-top:20px;border:1px solid;animation:fadeUp 0.35s ease; }
+    #result-box.approved { background:var(--green-lt);border-color:#6de5be; }
+    #result-box.rejected { background:var(--red-lt);border-color:#f8b4b4; }
+    .result-icon  { font-size:40px;margin-bottom:10px; }
+    .result-title { font-family:'DM Serif Display',serif;font-size:26px;margin-bottom:6px; }
+    #result-box.approved .result-title { color:var(--green); }
+    #result-box.rejected .result-title { color:var(--red); }
+    .result-msg { font-size:14px;color:var(--ink-soft);line-height:1.6; }
+    .confidence-badge { display:inline-block;margin-top:12px;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:600; }
+    .approved .confidence-badge { background:rgba(14,159,110,0.15);color:var(--green); }
+    .rejected .confidence-badge { background:rgba(224,36,36,0.12);color:var(--red); }
+    .steps { display:flex;justify-content:center;gap:8px;margin-bottom:36px; }
+    .step { display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--ink-muted); }
+    .step-num { width:26px;height:26px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--ink-muted); }
+    .step.active .step-num { background:var(--accent);color:#fff; }
+    .step.active { color:var(--ink); }
+    .step-line { width:32px;height:1px;background:var(--border); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    @media(max-width:600px){.card{padding:24px 18px}.grid-2,.grid-3{grid-template-columns:1fr}.span-2{grid-column:span 1}header{padding:14px 20px}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo-mark">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M3 10h14M10 3l7 7-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <span class="logo-text">Loan<span>Sense</span></span>
+</header>
+<div class="hero">
+  <!-- <div class="hero-tag">AI-Powered Prediction</div> -->
+  <h1>Will your loan<br/>get approved?</h1>
+  <p>Fill in your details below and our model will predict your loan approval instantly.</p>
+</div>
+<div class="steps">
+  <div class="step active"><div class="step-num">1</div> Personal Info</div>
+  <div class="step-line"></div>
+  <div class="step active"><div class="step-num">2</div> Financials</div>
+  <div class="step-line"></div>
+  <div class="step active"><div class="step-num">3</div> Loan Details</div>
+</div>
+<div class="form-wrap">
+  <form id="loanForm">
+    <div class="card">
+      <div class="section-title">Personal Information</div>
+      <div class="grid-2">
+        <div class="field"><label>Full Name <span class="req">*</span></label><input type="text" name="name" placeholder="e.g. Ravi Kumar" required/></div>
+        <div class="field"><label>Gender <span class="req">*</span></label><div class="select-wrap"><select name="gender" required><option value="" disabled selected>Select gender</option><option>Male</option><option>Female</option></select></div></div>
+        <div class="field"><label>Marital Status <span class="req">*</span></label><div class="select-wrap"><select name="married" required><option value="" disabled selected>Select status</option><option value="Single">Single</option><option value="Married">Married</option></select></div></div>
+        <div class="field"><label>Dependents</label><div class="select-wrap"><select name="dependents"><option value="0">0 (None)</option><option value="1">1</option><option value="2">2</option><option value="3+">3 or more</option></select></div></div>
+        <div class="field"><label>Education <span class="req">*</span></label><div class="select-wrap"><select name="education" required><option value="" disabled selected>Select level</option><option>Graduate</option><option>Not Graduate</option></select></div></div>
+        <div class="field"><label>Employment Type <span class="req">*</span></label><div class="select-wrap"><select name="self_employed" required><option value="" disabled selected>Select type</option><option value="No">Salaried / Employed</option><option value="Yes">Self-Employed</option></select></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Financial Information</div>
+      <div class="grid-2">
+        <div class="field"><label>Monthly Income (₹) <span class="req">*</span></label><input type="number" name="applicant_income" placeholder="e.g. 50000" min="0" required/><span class="hint">Your take-home salary per month</span></div>
+        <div class="field"><label>Co-applicant Monthly Income (₹)</label><input type="number" name="coapplicant_income" placeholder="0" min="0" value="0"/></div>
+        <div class="field span-2"><label>Credit History <span class="req">*</span></label><div class="select-wrap"><select name="credit_history" required><option value="" disabled selected>Select credit history</option><option value="1">Good — I repay loans/bills on time</option><option value="0">Poor — I have missed payments</option></select></div><span class="hint">The most important factor in loan approval</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Loan Details</div>
+      <div class="grid-2">
+        <div class="field"><label>Loan Amount (₹) <span class="req">*</span></label><input type="number" name="loan_amount" placeholder="e.g. 200000" min="1000" required/></div>
+        <div class="field"><label>Loan Term <span class="req">*</span></label><div class="select-wrap"><select name="loan_amount_term" required><option value="" disabled selected>Select term</option><option value="60">5 years</option><option value="120">10 years</option><option value="180">15 years</option><option value="240">20 years</option><option value="300">25 years</option><option value="360">30 years</option><option value="480">40 years</option></select></div></div>
+        <div class="field span-2">
+          <label>Property Area <span class="req">*</span></label>
+          <div class="grid-3" style="gap:10px;margin-top:4px;">
+            <label class="area-option"><input type="radio" name="property_area" value="Urban" required/><div class="area-card"><span class="area-icon">🏙️</span><span class="area-name">Urban</span><span class="area-sub">City / Metro</span></div></label>
+            <label class="area-option"><input type="radio" name="property_area" value="Semiurban"/><div class="area-card"><span class="area-icon">🏘️</span><span class="area-name">Semi-urban</span><span class="area-sub">Town / Suburb</span></div></label>
+            <label class="area-option"><input type="radio" name="property_area" value="Rural"/><div class="area-card"><span class="area-icon">🌾</span><span class="area-name">Rural</span><span class="area-sub">Village / Countryside</span></div></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn-predict" id="submitBtn">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="white" stroke-width="1.5"/><path d="M7 10l2 2 4-4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Predict My Loan Approval
+    </button>
+    <div id="result-box">
+      <div class="result-icon" id="result-icon"></div>
+      <div class="result-title" id="result-title"></div>
+      <div class="result-msg" id="result-msg"></div>
+      <div class="confidence-badge" id="result-confidence"></div>
+    </div>
+  </form>
+</div>
+<script>
+document.getElementById('loanForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn=document.getElementById('submitBtn');
+  const resultBox=document.getElementById('result-box');
+  btn.disabled=true;
+  btn.innerHTML='<div class="spinner"></div> Predicting...';
+  const data=Object.fromEntries(new FormData(this));
+  try {
+    const response=await fetch('http://localhost:5000/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const result=await response.json();
+    resultBox.style.display='block';
+    if(result.approved){
+      resultBox.className='approved';
+      document.getElementById('result-icon').textContent='🎉';
+      document.getElementById('result-title').textContent='Loan Likely Approved!';
+      document.getElementById('result-msg').textContent=`Great news, ${data.name}! Based on your profile and our trained ML model, your loan application looks strong.`;
+    } else {
+      resultBox.className='rejected';
+      document.getElementById('result-icon').textContent='❌';
+      document.getElementById('result-title').textContent='Loan May Be Rejected';
+      document.getElementById('result-msg').textContent=`Sorry, ${data.name}. Your application may face challenges. Consider improving your credit history or reducing the loan amount.`;
+    }
+    document.getElementById('result-confidence').textContent=`Model confidence: ${result.confidence}%`;
+    resultBox.scrollIntoView({behavior:'smooth',block:'start'});
+  } catch(error) {
+    alert('Could not connect to the server.\nMake sure app.py is running:\n\n  python app.py');
+  }
+  btn.disabled=false;
+  btn.innerHTML='<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="white" stroke-width="1.5"/><path d="M7 10l2 2 4-4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Predict My Loan Approval';
+});
+</script>
+</body>
+</html>
