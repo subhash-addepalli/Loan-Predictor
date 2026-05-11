@@ -41,7 +41,10 @@ df["Self_Employed"] = df["Self_Employed"].map({"Yes": 1, "No": 0})
 df["Loan_Status"]   = df["Loan_Status"].map({"Y": 1, "N": 0})
 
 # Dependents: "3+" becomes 3
-df["Dependents"] = df["Dependents"].replace("3+", 3).astype(int)
+df["Dependents"] = df["Dependents"].replace("3+", 3)
+df["Dependents"] = pd.to_numeric(df["Dependents"], errors="coerce")
+df["Dependents"].fillna(0, inplace=True)
+df["Dependents"] = df["Dependents"].astype(int)
 
 # Property_Area has 3 values — convert to numbers
 df["Property_Area"] = df["Property_Area"].map({"Urban": 2, "Semiurban": 1, "Rural": 0})
